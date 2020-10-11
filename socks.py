@@ -16,6 +16,9 @@ _REMOTE_TIMEOUT = const(100)
 _CHUNK_SIZE = const(0x1000)
 
 socks_client_list = []
+socks_started = False
+verbose_l=1
+server_socket=None
 
 class SOCKS_client:
     SOCKS_VERSION = 5
@@ -246,7 +249,15 @@ def accept_socks_connect(local_socket):
 
 def start(lhost="0.0.0.0", lport=1080, verbose=1, max_connection=16):
     global verbose_l
+    global server_socket
+    global socks_started
+
     verbose_l = verbose
+
+    if socks_started:
+        log_msg(1, '[1] Server already started')
+        return
+
     try:
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -255,10 +266,16 @@ def start(lhost="0.0.0.0", lport=1080, verbose=1, max_connection=16):
         server_socket.setsockopt(socket.SOL_SOCKET, _SO_REGISTER_HANDLER, accept_socks_connect)
 
         log_msg(1, '[1] Server started [%s:%d]' % (lhost, lport))
+        socks_started = True
     except:
         log_msg(0, '[0] Error starting server [%s:%d]' % (lhost, lport))
 
 def stop():
+    global verbose_l
+    global socks_client_list
+    global server_socket
+    global socks_started
+
     log_msg(2, '[2] Performing shutdown')
     for client in socks_client_list:
         client.local_socket.setsockopt(socket.SOL_SOCKET, _SO_REGISTER_HANDLER, None)
@@ -274,6 +291,7 @@ def stop():
         server_socket.setsockopt(socket.SOL_SOCKET, _SO_REGISTER_HANDLER, None)
         server_socket.close()
 
+    socks_started = False
     log_msg(1, '[1] Server shutdown')
 
 def restart(lhost="0.0.0.0", lport=1080, verbose=1, max_connection=16):

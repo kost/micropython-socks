@@ -167,7 +167,7 @@ class SOCKS_client:
                 domainname_length = ord(local_socket.recv(1))
                 domainname = ""
                 for i in range(domainname_length):
-                    domainname += (local_socket.recv(1))
+                    domainname += (local_socket.recv(1).decode("ascii"))
                 log_msg(3, "[3] Domain name: %s" % (domainname))
                 dst_port = ord(local_socket.recv(1)) * 0x100 + ord(local_socket.recv(1))
                 log_msg(3, "[3] Port: %s" % (dst_port))
@@ -183,7 +183,7 @@ class SOCKS_client:
                     response += chr(SOCKS_client.IPV4)
                     response += SOCKS_client.BNDADDR
                     response += SOCKS_client.BNDPORT
-                    local_socket.send(response)
+                    local_socket.send(response.encode())
                     log_msg(2, "[2] Tunnel connected! Tranfering data...")
                     local_socket.setsockopt(socket.SOL_SOCKET, _SO_REGISTER_HANDLER, self.transfer_fromlocal)
                     self.remote_socket.setsockopt(socket.SOL_SOCKET, _SO_REGISTER_HANDLER, self.transfer_fromremote)

@@ -13,7 +13,7 @@ import sdist_upip
 setup(
     name='micropython-socks',
     py_modules=['socks'],
-    version='1.0.0',
+    version='1.0.1',
     description='MicroPython library implementing SOCKS server.',
     long_description='This library lets you start SOCKS server.',
     keywords='socks server proxy micropython',
